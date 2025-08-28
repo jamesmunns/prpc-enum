@@ -6,17 +6,11 @@
 // }
 
 use postcard_rpc::{
-    define_dispatch, endpoints,
-    header::{VarHeader, VarSeqKind},
-    host_client::test_channels as client,
-    server::{
-        Dispatch, SpawnContext,
+    define_dispatch, endpoints, header::{VarHeader, VarSeqKind}, host_client::test_channels as client, server::{
         impls::test_channels::{
-            ChannelWireRx, ChannelWireSpawn, ChannelWireTx,
-            dispatch_impl::{Settings, WireSpawnImpl, WireTxImpl, new_server},
-        },
-    },
-    topics,
+            dispatch_impl::{new_server, Settings, WireSpawnImpl, WireTxImpl}, ChannelWireRx, ChannelWireSpawn, ChannelWireTx
+        }, Dispatch, SpawnContext
+    }, topics, Key1, Key2, Key4
 };
 
 use postcard_schema::Schema;
@@ -32,6 +26,15 @@ pub enum FilterMode {
 
 #[tokio::main]
 async fn main() {
+    println!("{ENDPOINT_LIST:#?}");
+    for i in ENDPOINT_LIST.endpoints {
+        if i.0 == "filter/mode" {
+            println!("key8: hex{0:02X?} dec{0:?}", i.1.to_bytes());
+            println!("key4: hex{0:02X?} dec{0:?}", Key4::from_key8(i.1).to_bytes());
+            println!("key2: hex{0:02X?} dec{0:?}", Key2::from_key8(i.1).to_bytes());
+            println!("key1: hex{0:02X?} dec{0:?}", Key1::from_key8(i.1).to_bytes());
+        }
+    }
     let (client_tx, server_rx) = mpsc::channel(16);
     let (server_tx, client_rx) = mpsc::channel(16);
 
